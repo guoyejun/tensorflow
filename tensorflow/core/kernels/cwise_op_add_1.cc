@@ -36,7 +36,20 @@ REGISTER_KERNEL_BUILDER(Name("Add")
 
 
 #if TENSORFLOW_USE_SYCL
-REGISTER2(BinaryOp, SYCL, "Add", functor::add, float, double);
+REGISTER(BinaryOp, SYCL, "Add", functor::add, float);
+
+#if TENSORFLOW_USE_SYCL_NO_DOUBLE
+REGISTER_KERNEL_BUILDER(Name("Add")
+                            .Device(DEVICE_SYCL)
+                            .HostMemory("x")
+                            .HostMemory("y")
+                            .HostMemory("z")
+                            .TypeConstraint<double>("T"),
+                        BinaryOp<CPUDevice, functor::add<double>>);
+#else
+REGISTER(BinaryOp, SYCL, "Add", functor::add, double);
+#endif
+
 REGISTER_KERNEL_BUILDER(Name("Add")
                             .Device(DEVICE_SYCL)
                             .HostMemory("x")

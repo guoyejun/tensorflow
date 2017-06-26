@@ -12,6 +12,7 @@ CURRENT_DIR = os.path.dirname(sys.argv[0])
 COMPUTECPP_ROOT = CURRENT_DIR + '/../sycl/'
 COMPUTECPP_DRIVER= COMPUTECPP_ROOT + 'bin/compute++'
 COMPUTECPP_INCLUDE = COMPUTECPP_ROOT + 'include'
+TF_SYCL_NO_DOUBLE = os.getenv('TENSORFLOW_USE_SYCL_NO_DOUBLE')
 
 def main():
   remove_flags = ('-Wl,--no-undefined', '-Wno-unused-but-set-variable', '-Wignored-attributes')
@@ -36,6 +37,9 @@ def main():
 
   # add -D_GLIBCXX_USE_CXX11_ABI=0 to the command line if you have custom installation of GCC/Clang
   compiler_flags = compiler_flags + ['-DEIGEN_USE_SYCL=1', '-DTENSORFLOW_USE_SYCL', '-DEIGEN_HAS_C99_MATH']
+
+  if TF_SYCL_NO_DOUBLE == '1':
+    compiler_flags = compiler_flags + ['-DTENSORFLOW_USE_SYCL_NO_DOUBLE']
 
   if not compiling_cpp:
     # compile for C
